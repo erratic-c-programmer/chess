@@ -86,11 +86,24 @@ def genvalidmoves(coord: tuple[int, int], board: list[list[str]]) -> list[tuple[
     # KNIGHT
     elif piecetype == PIECES.N:
         # Hardcoded, whatever.
-        r=lambda x:tuple(reversed(x))
-        a=lambda x,y:(x[0]+y[0],x[1]+y[1])
-        b=lambda x,y,z:[x(a(y,z)),x(a(y,r(z)))]
-        d=lambda f,x,y,z:[f(x,y,z[i])for i in range(len(z))]
-        d(b,ret.append,(coord[0],coord[1]),tuple(permutations((1,2,-1,-2))))
+                    r=\
+                  lambda\
+                 x:tuple(\
+                reversed(x\
+            ));pass;(a)=lambda\
+                x,y:(x[0]+\
+            y[0],x[1]+y[1]);b=\
+                lambda x,y\
+               ,z:[x(a(y,z))
+              ,x(a(y,r(z)))];
+                    d=\
+                 lambda f\
+              ,x,y,z:[f(x,y,\
+           z[ii])for ii in range
+         (len(z))];d(b,ret.append,
+         (coord[0],coord[1]),tuple
+         (permutations((1,2,-1,-2)
+                  )))+[1]
 
     # KING
     elif piecetype == PIECES.K:
