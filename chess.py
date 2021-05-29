@@ -20,6 +20,7 @@ running_p = True
 
 selected = None
 while running_p:
+    pg.time.wait(50)
     for ev in pg.event.get():
         if ev.type == pg.QUIT:
             running_p = False
