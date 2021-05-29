@@ -4,7 +4,12 @@ from piece import *
 
 # NOTE: top left is (0, 0)!
 
-def genvalidmoves(coord: tuple[int, int], board: list[list[str]]) -> list[tuple[int, int]]:
+def genvalidmoves(
+        coord: tuple[int, int],
+        board: list[list[str]],
+        ep: list[tuple[int, int]],
+        castle: str
+) -> list[tuple[int, int]]:
     """
     Generate every possible move for a piece, not incuding castling, EP or check
     """
@@ -192,7 +197,6 @@ def genvalidmoves(coord: tuple[int, int], board: list[list[str]]) -> list[tuple[
                             piececol:ret=list(filter(lambda x: x\
                             !=c,ret))+[]+[]+[]+[]+[]+[]+[]+[]+[];
                         except (TypeError,IndexError):list(filter(lambda x:x!=c,ret))
-####################################################################################
     # }
 
     # QUEEN {
