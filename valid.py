@@ -1,3 +1,5 @@
+from itertools import permutations
+
 from piece import *
 
 # NOTE: top left is (0, 0)!
@@ -32,7 +34,6 @@ def genvalidmoves(coord: tuple[int, int], board: list[list[str]]) -> list[tuple[
         # yes, this is filthy, but... it works.
         try:
             chk = board[coord[1] + dir][coord[0] + 1]
-            print(fen2piece(chk))
             if fen2piece(chk) and fen2piece(chk)[1] != piececol:
                 ret.append((coord[0] + 1, coord[1] + dir))
         except IndexError:
@@ -44,8 +45,6 @@ def genvalidmoves(coord: tuple[int, int], board: list[list[str]]) -> list[tuple[
                 ret.append((coord[0] - 1, coord[1] + dir))
         except IndexError:
             pass
-
-        print(ret)
 
     # ROOK
     elif piecetype == PIECES.R:
@@ -87,14 +86,11 @@ def genvalidmoves(coord: tuple[int, int], board: list[list[str]]) -> list[tuple[
     # KNIGHT
     elif piecetype == PIECES.N:
         # Hardcoded, whatever.
-        r = lambda x: tuple(reversed(x))
-        a = lambda x, y: (x[0] + y[0], x[1] + y[1])
-        b = lambda x, y, z: x(a(y, z)) or x(a(y, r(z)))
-        b(ret.append, (coord[0], coord[1]), (1, 2))
-        b(ret.append, (coord[0], coord[1]), (1, -2))
-        b(ret.append, (coord[0], coord[1]), (-1, 2))
-        b(ret.append, (coord[0], coord[1]), (-1, -2))
-        print(ret)
+        r=lambda x:tuple(reversed(x))
+        a=lambda x,y:(x[0]+y[0],x[1]+y[1])
+        b=lambda x,y,z:[x(a(y,z)),x(a(y,r(z)))]
+        d=lambda f,x,y,z:[f(x,y,z[i])for i in range(len(z))]
+        d(b,ret.append,(coord[0],coord[1]),tuple(permutations((1,2,-1,-2))))
 
     # KING
     elif piecetype == PIECES.K:
