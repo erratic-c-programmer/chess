@@ -1,24 +1,30 @@
 from itertools import permutations
+from copy import deepcopy
 
 from piece import *
 
 # NOTE: top left is (0, 0)!
 
+Coord = tuple[int, int]
 def genvalidmoves(
-        coord: tuple[int, int],
+        coord: Coord,
         board: list[list[str]],
-        ep: list[tuple[int, int]],
+        ep: tuple[list[Coord], list[Coord]],  # (white, black)
         castle: str
-) -> list[tuple[int, int]]:
+) -> tuple[
+        list[Coord],
+        tuple[list[Coord], list[Coord]],
+        str,
+]:
     """
     Generate every possible move for a piece, not incuding castling, EP or check
     """
+    ret     = []
+
     if not fen2piece(board[coord[1]][coord[0]]):
-        return []
+        return ([], ep, castle)
 
     piecetype, piececol = fen2piece(board[coord[1]][coord[0]])
-
-    ret = []
 
     # PAWN {
     dir = 0
@@ -35,7 +41,7 @@ def genvalidmoves(
         if not fen2piece(board[coord[1] + dir][coord[0]]):
             ret.append((coord[0], coord[1] + dir))
 
-        # Capturing
+        # Capturing {
         # yes, this is filthy, but... it works.
         try:
             chk = board[coord[1] + dir][coord[0] + 1]
@@ -50,6 +56,16 @@ def genvalidmoves(
                 ret.append((coord[0] - 1, coord[1] + dir))
         except IndexError:
             pass
+        # }
+
+        # En-passant -- a seperate case, because it's a stupid rule {
+        for cep in ep[1]:  # white; check the black EP list
+            if abs(cep[0] - coord[0]) == 1 and cep[1] - coord[1] == -1:
+                ret.append(cep)
+        for cep in ep[0]:  # black; check the white EP list
+            if abs(cep[0] - coord[0]) == 1 and cep[1] - coord[1] == 1:
+                ret.append(cep)
+        # }
     # }
 
     # ROOK {
@@ -281,6 +297,6 @@ def genvalidmoves(
 
 
     # OK
-    return ret
+    return (ret, ep, castle)
 
 # vim:foldmethod=marker:foldmarker={,}:

@@ -27,7 +27,6 @@ while running_p:
         elif ev.type == pg.MOUSEBUTTONDOWN:
             if not selected:
                 selected = b.surf2box(pg.mouse.get_pos())
-                print(selected)
             else:  # piece has already been chosen
                 b.movpiece(selected, b.surf2box(pg.mouse.get_pos()), valid.genvalidmoves)
                 selected = None
