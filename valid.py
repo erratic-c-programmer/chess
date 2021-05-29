@@ -6,8 +6,7 @@ from piece import *
 
 def genvalidmoves(coord: tuple[int, int], board: list[list[str]]) -> list[tuple[int, int]]:
     """
-    Generate every possible move for a piece, not incuding blocking, castling, EP or check
-    No bound-checking!
+    Generate every possible move for a piece, not incuding castling, EP or check
     """
     if not fen2piece(board[coord[1]][coord[0]]):
         return []
@@ -16,7 +15,7 @@ def genvalidmoves(coord: tuple[int, int], board: list[list[str]]) -> list[tuple[
 
     ret = []
 
-    # PAWN
+    # PAWN {
     dir = 0
     if piecetype == PIECES.P:
         if piececol == COL.WHITE:
@@ -28,7 +27,8 @@ def genvalidmoves(coord: tuple[int, int], board: list[list[str]]) -> list[tuple[
             if coord[1] == 1:
                 ret.append((coord[0], coord[1] + 2))
 
-        ret.append((coord[0], coord[1] + dir))
+        if not fen2piece(board[coord[1] + dir][coord[0]]):
+            ret.append((coord[0], coord[1] + dir))
 
         # Capturing
         # yes, this is filthy, but... it works.
@@ -45,47 +45,95 @@ def genvalidmoves(coord: tuple[int, int], board: list[list[str]]) -> list[tuple[
                 ret.append((coord[0] - 1, coord[1] + dir))
         except IndexError:
             pass
+    # }
 
-    # ROOK
+    # ROOK {
     elif piecetype == PIECES.R:
-        for i in range(8):
-            ret += [(i, coord[1])]
-            ret += [(coord[0], i)]
+        # Horizontal right
+        for i in range(coord[0] + 1, 8):
+            if fen2piece(board[coord[1]][i]):
+                if fen2piece(board[coord[1]][i])[1] != piececol:
+                    ret.append((i, coord[1]))
+                break
+            ret.append((i, coord[1]))
 
-    # BISHOP
+        # Horizontal left
+        for i in range(coord[0] - 1, -1, -1):
+            if fen2piece(board[coord[1]][i]):
+                if fen2piece(board[coord[1]][i])[1] != piececol:
+                    ret.append((i, coord[1]))
+                break
+            ret.append((i, coord[1]))
+
+        # Vertical up
+        for i in range(coord[1] - 1, -1, -1):
+            if fen2piece(board[i][coord[0]]):
+                if fen2piece(board[i][coord[0]])[1] != piececol:
+                    ret.append((coord[0], i))
+                break
+            ret.append((coord[0], i))
+
+        # Vertical down
+        for i in range(coord[1] + 1, 8):
+            if fen2piece(board[i][coord[0]]):
+                if fen2piece(board[i][coord[0]])[1] != piececol:
+                    ret.append((coord[0], i))
+                break
+            ret.append((coord[0], i))
+
+    # }
+
+    # BISHOP {
     elif piecetype == PIECES.B:
         # Ugh loops
         i = coord[0]
         j = coord[1]
-        while i <= 7 and j <= 7:
+        while i <= 6 and j <= 6:
             i += 1
             j += 1
+            if fen2piece(board[j][i]):
+                if fen2piece(board[j][i])[1] != piececol:
+                    ret.append((i, j))
+                break
             ret.append((i, j))
 
         i = coord[0]
         j = coord[1]
-        while i >= 0 and j >= 0:
+        while i >= 1 and j >= 1:
             i -= 1
             j -= 1
+            if fen2piece(board[j][i]):
+                if fen2piece(board[j][i])[1] != piececol:
+                    ret.append((i, j))
+                break
             ret.append((i, j))
 
         i = coord[0]
         j = coord[1]
-        while i <= 7 and j >= 0:
+        while i <= 6 and j >= 1:
             i += 1
             j -= 1
+            if fen2piece(board[j][i]):
+                if fen2piece(board[j][i])[1] != piececol:
+                    ret.append((i, j))
+                break
             ret.append((i, j))
 
         i = coord[0]
         j = coord[1]
-        while i <= 7 and j <= 7:
+        while i <= 6 and j <= 6:
             i -= 1
             j += 1
+            if fen2piece(board[j][i]):
+                if fen2piece(board[j][i])[1] != piececol:
+                    ret.append((i, j))
+                break
             ret.append((i, j))
+    # }
 
-    # KNIGHT
+    # KNIGHT {
     elif piecetype == PIECES.N:
-        # Hardcoded, whatever.
+                     #
                     r=\
                   lambda\
                  x:tuple(\
@@ -104,50 +152,131 @@ def genvalidmoves(coord: tuple[int, int], board: list[list[str]]) -> list[tuple[
          (coord[0],coord[1]),tuple
          (permutations((1,2,-1,-2)
                   )))+[1]
+                    for\
+                   (c)in\
+                    ret:
+                        try:
+                            if fen2piece(board[c[1]][c[0]])[1]==\
+                            piececol:ret=list(filter(lambda x: x\
+                            !=c,ret))+[]+[]+[]+[]+[]+[]+[]+[]+[];
+                        except (TypeError,IndexError):list(filter(lambda x:x!=c,ret))
+    # }
 
-    # KING
+    # KING {
     elif piecetype == PIECES.K:
-        for m0 in (coord[0] + 1, coord[1] - 1):
-            for m1 in (coord[0] + 1, coord[0] - 1):
-                if (m0 <= 7 or m1 <= 7 or m0 >= 0 or m1 >= 0):
-                    ret.append((m0, m1))
-                    ret.append((m1, m0))
+        # Literally the same as Knight except for the numbers
+                     #
+                    r=\
+                  lambda\
+                 x:tuple(\
+                reversed(x\
+            ));pass;(a)=lambda\
+                x,y:(x[0]+\
+            y[0],x[1]+y[1]);b=\
+                lambda x,y\
+               ,z:[x(a(y,z))
+              ,x(a(y,r(z)))];
+                    d=\
+                 lambda f\
+              ,x,y,z:[f(x,y,\
+           z[ii])for ii in range
+         (len(z))];d(b,ret.append,
+         (coord[0],coord[1]),tuple
+         (permutations((1,0,-1,1,\
+                -1))));pass
+                    for\
+                   (c)in\
+                    ret:
+                        try:
+                            if fen2piece(board[c[1]][c[0]])[1]==\
+                            piececol:ret=list(filter(lambda x: x\
+                            !=c,ret))+[]+[]+[]+[]+[]+[]+[]+[]+[];
+                        except (TypeError,IndexError):list(filter(lambda x:x!=c,ret))
+####################################################################################
+    # }
 
-    # QUEEN
+    # QUEEN {
     elif piecetype == PIECES.Q:
-        for i in range(8):
-            ret += [(i, coord[1])]
-            ret += [(coord[0], i)]
+        # Horizontal right
+        for i in range(coord[0] + 1, 8):
+            if fen2piece(board[coord[1]][i]):
+                if fen2piece(board[coord[1]][i])[1] != piececol:
+                    ret.append((i, coord[1]))
+                break
+            ret.append((i, coord[1]))
+
+        # Horizontal left
+        for i in range(coord[0] - 1, -1, -1):
+            if fen2piece(board[coord[1]][i]):
+                if fen2piece(board[coord[1]][i])[1] != piececol:
+                    ret.append((i, coord[1]))
+                break
+            ret.append((i, coord[1]))
+
+        # Vertical up
+        for i in range(coord[1] - 1, -1, -1):
+            if fen2piece(board[i][coord[0]]):
+                if fen2piece(board[i][coord[0]])[1] != piececol:
+                    ret.append((coord[0], i))
+                break
+            ret.append((coord[0], i))
+
+        # Vertical down
+        for i in range(coord[1] + 1, 8):
+            if fen2piece(board[i][coord[0]]):
+                if fen2piece(board[i][coord[0]])[1] != piececol:
+                    ret.append((coord[0], i))
+                break
+            ret.append((coord[0], i))
 
         # Ugh more loops
         i = coord[0]
         j = coord[1]
-        while i <= 7 and j <= 7:
+        while i <= 6 and j <= 6:
             i += 1
             j += 1
+            if fen2piece(board[j][i]):
+                if fen2piece(board[j][i])[1] != piececol:
+                    ret.append((i, j))
+                break
             ret.append((i, j))
 
         i = coord[0]
         j = coord[1]
-        while i >= 0 and j >= 0:
+        while i >= 1 and j >= 1:
             i -= 1
             j -= 1
+            if fen2piece(board[j][i]):
+                if fen2piece(board[j][i])[1] != piececol:
+                    ret.append((i, j))
+                break
             ret.append((i, j))
 
         i = coord[0]
         j = coord[1]
-        while i <= 7 and j >= 0:
+        while i <= 6 and j >= 1:
             i += 1
             j -= 1
+            if fen2piece(board[j][i]):
+                if fen2piece(board[j][i])[1] != piececol:
+                    ret.append((i, j))
+                break
             ret.append((i, j))
 
         i = coord[0]
         j = coord[1]
-        while i <= 7 and j <= 7:
+        while i <= 6 and j <= 6:
             i -= 1
             j += 1
+            if fen2piece(board[j][i]):
+                if fen2piece(board[j][i])[1] != piececol:
+                    ret.append((i, j))
+                break
             ret.append((i, j))
+    # }
 
 
     # OK
     return ret
+
+# vim:foldmethod=marker:foldmarker={,}:

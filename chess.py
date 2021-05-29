@@ -2,7 +2,6 @@
 import pygame as pg
 
 import board
-import piece
 import valid
 
 SQ_X = 60
