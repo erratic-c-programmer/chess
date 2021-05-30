@@ -4,8 +4,8 @@ import pygame as pg
 import board
 import valid
 
-SQ_X = 60
-SQ_Y = 60
+SQ_X = 100
+SQ_Y = 100
 SQ_GAP = 1
 SQ_COL1 = pg.Color(118,150,86)
 SQ_COL2 = pg.Color(238,238,210)

@@ -60,10 +60,10 @@ def genvalidmoves(
 
         # En-passant -- a seperate case, because it's a stupid rule {
         for cep in ep[1]:  # white; check the black EP list
-            if abs(cep[0] - coord[0]) == 1 and cep[1] - coord[1] == -1:
+            if abs(cep[0] - coord[0]) == 1 and cep[1] - coord[1] == -1 and piececol == 'w':
                 ret.append(cep)
         for cep in ep[0]:  # black; check the white EP list
-            if abs(cep[0] - coord[0]) == 1 and cep[1] - coord[1] == 1:
+            if abs(cep[0] - coord[0]) == 1 and cep[1] - coord[1] == 1 and piececol == 'b':
                 ret.append(cep)
         # }
     # }
