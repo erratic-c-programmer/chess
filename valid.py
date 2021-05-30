@@ -170,9 +170,9 @@ def genvalidmoves(
               ,x,y,z:[f(x,y,\
            z[ii])for ii in range
          (len(z))];d(b,ret.append,
-         (coord[0],coord[1]),tuple
-         (permutations((1,2,-1,-2)
-                  )))+[1]
+         (coord[0],coord[1]),((1,\
+         2),(1,-2),(-1,2),(-1,-2)\
+                   ))+[1]
                     for\
                    (c)in\
                     ret:

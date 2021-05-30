@@ -18,18 +18,45 @@ b.drawfen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
 
 running_p = True
 
-selected = None
+cbox    = None
+cbox_o  = None
+piece_selected_p = False
+
 while running_p:
     pg.time.wait(50)
     for ev in pg.event.get():
         if ev.type == pg.QUIT:
             running_p = False
         elif ev.type == pg.MOUSEBUTTONDOWN:
-            if not selected:
-                selected = b.surf2box(pg.mouse.get_pos())
-            else:  # piece has already been chosen
-                b.movpiece(selected, b.surf2box(pg.mouse.get_pos()), valid.genvalidmoves)
-                selected = None
+            cbox_o  = cbox
+            cbox    = b.surf2box(pg.mouse.get_pos())
+
+    ###
+
+    if not piece_selected_p:
+        if cbox and b.getsqr(cbox):  # clicked on piece
+            piece_selected_p = True
+    else:
+        csurf = pg.Surface((SQ_X, SQ_Y))
+        csurf.fill((0, 0, 0))
+        csurf.set_colorkey((0, 0, 0))
+        pg.draw.circle(
+            csurf,
+            pg.Color(111, 199, 135, 200),
+            (SQ_X / 2, SQ_Y / 2),
+            SQ_X / 6,
+        )
+        csurf = csurf.convert_alpha()
+        try:  # ...ew.
+            for c in b.getvalidmovs(cbox, valid.genvalidmoves):
+                b.putitem(csurf, c)
+        except TypeError:
+            pass
+        if cbox_o:
+            piece_selected_p = not b.movpiece(cbox_o, cbox, valid.genvalidmoves)
+            cbox = cbox_o = None
+
+    ###
 
     screen.blit(b.getsurf(), (0, 0))
 

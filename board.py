@@ -18,7 +18,7 @@ class Chessboard:
         self.colors     = colors
         self.arr_rep    = [['' for _ in range(boxes[0])] for _ in range(boxes[1])]
 
-        self.totalsize = (
+        self.totalsize  = (
             self.boxsize[0] * self.boxes[0],
             self.boxsize[1] * self.boxes[1]
         )
@@ -28,6 +28,8 @@ class Chessboard:
         self.enpassant  = ([], [])
         self.castle     = ""
         self.whitep     = True
+
+        self.blitq      = []
 
     def drawboard(self):
         # Draw
@@ -42,6 +44,11 @@ class Chessboard:
                     )
                     + self.boxsize  # NOTE: tuple append
                 )
+
+        # Blit stuff on the board
+        for c in self.blitq:
+            self.board_surf.blit(c[0], self.box2surf(c[1]))
+        self.blitq.clear()  # empty blit queue
         return
 
     def getsurf(self) -> pg.surface.Surface:
@@ -84,17 +91,20 @@ class Chessboard:
             surf_coord[1] // self.boxsize[1]
         )
 
+    def getsqr(self, box_coord: Coord) -> Union[tuple[str, str], None]:
+        return piece.fen2piece(self.arr_rep[box_coord[1]][box_coord[0]])
+
     def putitem(self, item_surf: pg.Surface, box_coord: Coord) -> None:
         """
         Blits a surface to a box
         """
-        self.board_surf.blit(item_surf, self.box2surf(box_coord))
+        self.blitq.append((item_surf, box_coord))
         return
 
     def putpiece(self, piece_char: str, box_coord: Coord) -> None:
         self.arr_rep[box_coord[1]][box_coord[0]] = piece_char
 
-    def movpiece(
+    def movpiece( #{
             self,
             startcoord: Coord,
             endcoord: Coord,
@@ -160,8 +170,25 @@ class Chessboard:
 
         else:
             return False
+        #}
 
-    def drawfen(self, fenstr: str) -> None:
+    def getvalidmovs(
+            self,
+            startcoord: Coord,
+            valid_fn: Callable[
+                [Coord, list[list[str]], tuple[list[Coord], list[Coord]], str],
+                tuple[
+                    list[Coord],
+                    tuple[list[Coord], list[Coord]],
+                    str
+                ]
+            ]
+    ):
+        return valid_fn(
+            startcoord, self.arr_rep, self.enpassant, self.castle
+        )[0]
+
+    def drawfen(self, fenstr: str) -> None:  #{
         """
         Blits a FEN string onto a board
         """
@@ -177,5 +204,6 @@ class Chessboard:
                     j += 1
             i += 1
         return
+    #}
 
 # vim:foldmethod=marker:foldmarker={,}:
