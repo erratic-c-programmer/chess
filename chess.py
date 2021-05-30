@@ -22,6 +22,18 @@ cbox    = None
 cbox_o  = None
 piece_selected_p = False
 
+# Circle
+csurf = pg.Surface((SQ_X, SQ_Y))
+csurf.fill((0, 0, 0))
+csurf.set_colorkey((0, 0, 0))
+pg.draw.circle(
+    csurf,
+    pg.Color(111, 199, 135, 200),
+    (SQ_X / 2, SQ_Y / 2),
+    SQ_X / 6,
+)
+csurf = csurf.convert_alpha()
+
 while running_p:
     pg.time.wait(50)
     for ev in pg.event.get():
@@ -37,24 +49,15 @@ while running_p:
         if cbox and b.getsqr(cbox):  # clicked on piece
             piece_selected_p = True
     else:
-        csurf = pg.Surface((SQ_X, SQ_Y))
-        csurf.fill((0, 0, 0))
-        csurf.set_colorkey((0, 0, 0))
-        pg.draw.circle(
-            csurf,
-            pg.Color(111, 199, 135, 200),
-            (SQ_X / 2, SQ_Y / 2),
-            SQ_X / 6,
-        )
-        csurf = csurf.convert_alpha()
-        try:  # ...ew.
-            for c in b.getvalidmovs(cbox, valid.genvalidmoves):
-                b.putitem(csurf, c)
-        except TypeError:
-            pass
         if cbox_o:
             piece_selected_p = not b.movpiece(cbox_o, cbox, valid.genvalidmoves)
             cbox = cbox_o = None
+        else:
+            try:  # ...ew.
+                for c in b.getvalidmovs(cbox, valid.genvalidmoves):
+                    b.putitem(csurf, c)
+            except TypeError:
+                pass
 
     ###
 
