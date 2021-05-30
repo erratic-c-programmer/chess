@@ -7,8 +7,8 @@ import valid
 SQ_X = 60
 SQ_Y = 60
 SQ_GAP = 1
-SQ_COL1 = pg.Color(255, 255, 255)
-SQ_COL2 = pg.Color(139, 69, 19)
+SQ_COL1 = pg.Color(118,150,86)
+SQ_COL2 = pg.Color(238,238,210)
 
 pg.init()
 screen = pg.display.set_mode((SQ_X * 8, SQ_Y * 8))
